@@ -16,7 +16,7 @@
  *
  *=========================================================================*/
 
-package plugins.ICY-ITK-Plugins;
+package plugins.ITK;
 
 import icy.gui.frame.progress.AnnounceFrame;
 import icy.image.IcyBufferedImage;
@@ -32,11 +32,7 @@ import org.itk.simple.PixelIDValueEnum;
 
 /**
  *
- * @author Fabrice de Chaumont & Stephane Dallongeville
- *
- * This tutorial display a simple message at the bottom of the screen, in a scrolling annonceFrame.
- * A class is an ICY plugin as it extends icy.plugin.abstract_.Plugin
- * It can then be visible in the menu if it implements icy.plugin.interface_.PluginImageAnalysis
+ * This plugins applies a binary threshold to the input image.
  *
  */
 public class BinaryThresholdPlugin extends Plugin implements PluginImageAnalysis {
@@ -53,7 +49,7 @@ public class BinaryThresholdPlugin extends Plugin implements PluginImageAnalysis
 
     byte[] dataBuffer = icyImage.getDataXYAsByte(0);
 
-    PixelIDValueEnum pixelID = null; // How to initialize ?
+    PixelIDValueEnum pixelID = PixelIDValueEnum.sitkUInt8;
 
     Image inputImage = new Image( icyImage.getSizeX(), icyImage.getSizeY(), pixelID );
 
