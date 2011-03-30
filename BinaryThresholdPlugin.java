@@ -23,11 +23,12 @@ import icy.image.IcyBufferedImage;
 import icy.plugin.abstract_.Plugin;
 import icy.plugin.interface_.PluginImageAnalysis;
 import icy.sequence.Sequence;
+import icy.type.TypeUtil;
 
 import org.itk.simple.BinaryErodeImageFilter;
 import org.itk.simple.BinaryThresholdImageFilter;
 import org.itk.simple.Image;
-import org.itk.simple.PixelContainer;
+import org.itk.simple.ImportImageFilter;
 import org.itk.simple.PixelIDValueEnum;
 
 /**
@@ -47,35 +48,51 @@ public class BinaryThresholdPlugin extends Plugin implements PluginImageAnalysis
 
     IcyBufferedImage icyImage = getFocusedImage();
 
-    byte[] dataBuffer = icyImage.getDataXYAsByte(0);
-
-    PixelIDValueEnum pixelID = PixelIDValueEnum.sitkUInt8;
-
-    Image inputImage = new Image( icyImage.getSizeX(), icyImage.getSizeY(), pixelID );
-
-    PixelContainer pixelContainer = inputImage.getPixelContainer();
+    ImportImageFilter importer = new ImportImageFilter();
 
     int numberOfPixels = icyImage.getSizeX() * icyImage.getSizeY();
+    
+    //
+    //  Transfer image from ICY to ITK
+    //
+    switch ( icyImage.getDataType() )
+    {
+        case TypeUtil.TYPE_BYTE:
+        {
+        byte[] dataBuffer = icyImage.getDataXYAsByte(0);
 
-    // pixelContainer.setBufferAsInt8( dataBuffer, numberOfPixels );
+        // connect here the buffer to the importer
+        }
+    }
+   	Image inputImage = importer.execute();
+   	
+   	BinaryThresholdImageFilter thresholder = new BinaryThresholdImageFilter();
 
-    BinaryThresholdImageFilter thresholder = new BinaryThresholdImageFilter();
+   	thresholder.setLowerThreshold(10);
+   	thresholder.setUpperThreshold(100);
 
-    thresholder.setLowerThreshold(10);
-    thresholder.setUpperThreshold(100);
+   	Image output1 = thresholder.execute( inputImage );
 
-    Image output1 = thresholder.execute( inputImage );
+   	BinaryErodeImageFilter eroder = new BinaryErodeImageFilter();
 
-    BinaryErodeImageFilter eroder = new BinaryErodeImageFilter();
+   	Image output2 = eroder.execute( output1 );
+    	
+   	//
+   	// Transfer image from ITK to ICY
+   	//
+	switch ( icyImage.getDataType() )
+    {
+        case TypeUtil.TYPE_BYTE:
+        {
 
-    Image output2 = eroder.execute( output1 );
+        byte[] outputDataBuffer = icyImage.getDataXYAsByte(0); // FIXME
+    	//byte[] outputDataBuffer = output2.getBufferAsUnsignedInt8();
 
-    PixelContainer pixelsContainerOutput = output2.getPixelContainer();
+    	icyImage.setDataXYAsByte(numberOfPixels,outputDataBuffer);
+        }
+    }
 
-    // dataBuffer = pixelsContainerOutput.getBufferAsUnsignedInt8();
-
-    icyImage.setDataXYAsByte(0,dataBuffer);
-
+	
     Sequence sequence = new Sequence("Byte Image",icyImage);
 
     addSequence(sequence);
