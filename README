@@ -1,0 +1,8 @@
+This project is copyrighted by the Insight Software Consortium
+and it is distributed under the Apache 2.0 License.
+
+These files are plugins for ICY that expose the image processing
+functionalities of ITK via the SimpleITK layer.
+
+http://www.itk.org
+
