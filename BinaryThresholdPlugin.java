@@ -61,7 +61,7 @@ public class BinaryThresholdPlugin extends Plugin implements PluginImageAnalysis
         {
         byte[] dataBuffer = icyImage.getDataXYAsByte(0);
 
-        // connect here the buffer to the importer
+        importer.setBufferAsInt8( dataBuffer );
         }
     }
    	Image inputImage = importer.execute();
